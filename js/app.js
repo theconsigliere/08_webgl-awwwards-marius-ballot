@@ -5,6 +5,9 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
 import gui from "lil-gui"
 import gsap from "gsap"
 
+import SpherePillards from "./classes/SpherePillards.js"
+import Floor from "./classes/Floor.js"
+
 export default class Sketch {
   constructor(options) {
     this.scene = new THREE.Scene()
@@ -15,22 +18,23 @@ export default class Sketch {
     this.renderer = new THREE.WebGLRenderer()
     this.renderer.setPixelRatio(window.devicePixelRatio)
     this.renderer.setSize(this.width, this.height)
-    this.renderer.setClearColor(0xeeeeee, 1)
-    this.renderer.outputEncoding = THREE.sRGBEncoding
 
+    this.renderer.setClearColor(0x000000, 1)
+    this.renderer.outputColorSpace = THREE.SRGBColorSpace
     this.container.appendChild(this.renderer.domElement)
 
     this.camera = new THREE.PerspectiveCamera(
-      70,
+      75,
       window.innerWidth / window.innerHeight,
-      0.001,
+      0.1,
       1000
     )
 
     // var frustumSize = 10;
     // var aspect = window.innerWidth / window.innerHeight;
     // this.camera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, -1000, 1000 );
-    this.camera.position.set(0, 0, 2)
+    this.camera.position.set(0, 0, 5)
+    // this.camera.lookAt(0, 0, 0)
     this.controls = new OrbitControls(this.camera, this.renderer.domElement)
     this.time = 0
 
@@ -44,7 +48,6 @@ export default class Sketch {
   }
 
   settings() {
-    let that = this
     this.settings = {
       progress: 0,
     }
@@ -65,29 +68,32 @@ export default class Sketch {
   }
 
   addObjects() {
-    let that = this
-    this.material = new THREE.ShaderMaterial({
-      extensions: {
-        derivatives: "#extension GL_OES_standard_derivatives : enable",
-      },
-      side: THREE.DoubleSide,
-      uniforms: {
-        time: { type: "f", value: 0 },
-        resolution: { type: "v4", value: new THREE.Vector4() },
-        uvRate1: {
-          value: new THREE.Vector2(1, 1),
-        },
-      },
-      // wireframe: true,
-      // transparent: true,
-      vertexShader: vertex,
-      fragmentShader: fragment,
-    })
+    // this.material = new THREE.ShaderMaterial({
+    //   extensions: {
+    //     derivatives: "#extension GL_OES_standard_derivatives : enable",
+    //   },
+    //   side: THREE.DoubleSide,
+    //   uniforms: {
+    //     time: { type: "f", value: 0 },
+    //     resolution: { type: "v4", value: new THREE.Vector4() },
+    //     uvRate1: {
+    //       value: new THREE.Vector2(1, 1),
+    //     },
+    //   },
+    //   // wireframe: true,
+    //   // transparent: true,
+    //   vertexShader: vertex,
+    //   fragmentShader: fragment,
+    // })
 
-    this.geometry = new THREE.PlaneGeometry(1, 1, 1, 1)
+    // this.geometry = new THREE.BoxGeometry()
 
-    this.plane = new THREE.Mesh(this.geometry, this.material)
-    this.scene.add(this.plane)
+    // this.plane = new THREE.Mesh(this.geometry, this.material)
+    // this.scene.add(this.plane)
+
+    // Sphere Pillards
+    SpherePillards.init(this.scene)
+    Floor.init(this.scene)
   }
 
   stop() {
@@ -104,7 +110,8 @@ export default class Sketch {
   render() {
     if (!this.isPlaying) return
     this.time += 0.05
-    this.material.uniforms.time.value = this.time
+
+    // this.material.uniforms.time.value = this.time
     requestAnimationFrame(this.render.bind(this))
     this.renderer.render(this.scene, this.camera)
   }
