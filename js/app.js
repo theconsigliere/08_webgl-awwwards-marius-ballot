@@ -1,12 +1,11 @@
 import * as THREE from "three"
-import fragment from "./shader/fragment.glsl"
-import vertex from "./shader/vertex.glsl"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
 import gui from "lil-gui"
 import gsap from "gsap"
 
 import SpherePillards from "./classes/SpherePillards.js"
 import Floor from "./classes/Floor.js"
+import Spectrum from "./classes/Spectrum.js"
 
 export default class Sketch {
   constructor(options) {
@@ -33,7 +32,7 @@ export default class Sketch {
     // var frustumSize = 10;
     // var aspect = window.innerWidth / window.innerHeight;
     // this.camera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, -1000, 1000 );
-    this.camera.position.set(0, 0, 5)
+    this.camera.position.set(0, 0, 10)
     // this.camera.lookAt(0, 0, 0)
     this.controls = new OrbitControls(this.camera, this.renderer.domElement)
     this.time = 0
@@ -94,6 +93,7 @@ export default class Sketch {
     // Sphere Pillards
     SpherePillards.init(this.scene)
     Floor.init(this.scene)
+    Spectrum.init(this.scene)
   }
 
   stop() {
@@ -109,11 +109,12 @@ export default class Sketch {
 
   render() {
     if (!this.isPlaying) return
-    this.time += 0.05
+    this.time += 0.01
 
     // this.material.uniforms.time.value = this.time
     requestAnimationFrame(this.render.bind(this))
     this.renderer.render(this.scene, this.camera)
+    SpherePillards.update(this.time)
   }
 }
 
