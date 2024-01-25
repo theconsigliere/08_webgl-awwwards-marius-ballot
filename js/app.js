@@ -115,6 +115,7 @@ export default class Sketch {
     requestAnimationFrame(this.render.bind(this))
     this.renderer.render(this.scene, this.camera)
     SpherePillards.update(this.time)
+    Spectrum.update(this.time)
   }
 }
 

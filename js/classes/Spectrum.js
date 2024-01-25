@@ -8,6 +8,7 @@ class Spectrum {
   constructor(parameters) {
     this.bind
     this.modelLoader = new GLTFLoader()
+    this.textureLoader = new THREE.TextureLoader()
     // constructor body
   }
 
@@ -20,7 +21,20 @@ class Spectrum {
       fragmentShader: spectrumFragmentShader,
       uniforms: {
         uTime: { value: 0 },
+        uMatCap: {
+          value: this.textureLoader.load("../assets/textures/gunMetal.png"),
+        },
+        uWaveSize: {
+          value: 0.6,
+        },
+        uWaveBorder: {
+          value: 0.1,
+        },
+        uBorderColour: {
+          value: new THREE.Color("hsl(287, 80%, 80%)"),
+        },
       },
+      transparent: true,
     })
 
     this.modelLoader.load("../assets/models/spectrum.glb", (glb) => {
@@ -28,8 +42,8 @@ class Spectrum {
         if (child.isMesh) {
           this.spectrum = child
           this.spectrum.material = this.spectrumShaders
-          this.spectrum.scale.multiplyScalar(3)
-          this.spectrum.position.y = 1
+          this.spectrum.scale.multiplyScalar(2.5)
+          this.spectrum.position.y = -2.5
         }
       })
 
@@ -37,7 +51,9 @@ class Spectrum {
     })
   }
 
-  update() {}
+  update() {
+    this.spectrumShaders.uniforms.uTime.value += 1
+  }
 
   bind() {}
   // methods

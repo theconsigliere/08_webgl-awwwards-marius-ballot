@@ -121,7 +121,7 @@ class SpherePillards {
     let i = 0
     while (i < this.pillards.children.length) {
       this.pillards.children[i].children[0].position.y =
-        (Math.sin(time * 25 + this.pillards.children[i].position.x) + 1) * 1.2
+        (Math.sin(time * 15 + this.pillards.children[i].position.x) + 1) * 1.2
       i++
     }
   }
