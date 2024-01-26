@@ -135,6 +135,5 @@ void main() {
     vec4 outputColor = matCapOutput + borderOutput;
     outputColor *= opMaskOut;
 
-
     gl_FragColor = vec4(outputColor);
 }
