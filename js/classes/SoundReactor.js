@@ -8,7 +8,7 @@ class SoundReactor {
     this.analyser
     this.fdata
     this.url = audioUrl
-
+    this.isPlaying = false
     this.bind()
   }
 
@@ -22,6 +22,7 @@ class SoundReactor {
     this.audioSource.connect(this.analyser)
     this.audioSource.connect(this.ctx.destination)
     this.fdata = new Uint8Array(this.analyser.frequencyBinCount)
+    this.audio.currentTime = 76
 
     this.audio.play()
   }
@@ -32,11 +33,13 @@ class SoundReactor {
 
   play() {
     this.audio.play()
+    this.isPlaying = true
     RAF.subscribe("soundReactorUpdate", this.update)
   }
 
   pause() {
     this.audio.pause()
+    this.isPlaying = false
     RAF.unsubscribe("soundReactorUpdate")
   }
 

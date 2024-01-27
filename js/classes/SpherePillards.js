@@ -1,5 +1,6 @@
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
 import * as THREE from "three"
+import SoundReactor from "./SoundReactor.js"
 
 class SpherePillards {
   constructor(parameters) {
@@ -118,11 +119,23 @@ class SpherePillards {
   }
 
   update(time) {
-    let i = 0
-    while (i < this.pillards.children.length) {
-      this.pillards.children[i].children[0].position.y =
-        (Math.sin(time * 15 + this.pillards.children[i].position.x) + 1) * 1.2
-      i++
+    if (SoundReactor.isPlaying) {
+      // music animation
+      let i = 0
+      while (i < this.pillards.children.length) {
+        this.pillards.children[i].children[0].position.y =
+          (SoundReactor.fdata[i] / 255) * 2.5
+        i++
+      }
+    } else {
+      // original animation
+
+      let i = 0
+      while (i < this.pillards.children.length) {
+        this.pillards.children[i].children[0].position.y =
+          (Math.sin(time * 10 + this.pillards.children[i].position.x) + 1) * 1.2
+        i++
+      }
     }
   }
 
