@@ -6,12 +6,14 @@ import gsap from "gsap"
 import SpherePillards from "./classes/SpherePillards.js"
 import Floor from "./classes/Floor.js"
 import Spectrum from "./classes/Spectrum.js"
+import SoundReactor from "./classes/SoundReactor.js"
 
 export default class Sketch {
   constructor(options) {
     this.scene = new THREE.Scene()
 
-    this.container = options.dom
+    this.audioButton = options.dom.audioButton
+    this.container = options.dom.container
     this.width = this.container.offsetWidth
     this.height = this.container.offsetHeight
     this.renderer = new THREE.WebGLRenderer()
@@ -38,12 +40,35 @@ export default class Sketch {
     this.time = 0
 
     this.isPlaying = true
+    this.audioIsPlaying = false
+    this.audioIsInit = false
 
     this.addObjects()
     this.resize()
     this.render()
     this.setupResize()
+    this.addEventListeners()
     // this.settings();
+  }
+
+  addEventListeners() {
+    this.audioButton.addEventListener("click", (e) => {
+      if (!this.audioIsInit) {
+        SoundReactor.init()
+        this.audioIsInit = true
+      }
+
+      if (this.audioIsPlaying) {
+        this.audioIsPlaying = false
+        e.currentTarget.textContent = "Play"
+        SoundReactor.pause()
+        return
+      }
+
+      this.audioIsPlaying = true
+      e.currentTarget.textContent = "Pause"
+      SoundReactor.play()
+    })
   }
 
   settings() {
@@ -120,5 +145,8 @@ export default class Sketch {
 }
 
 new Sketch({
-  dom: document.getElementById("container"),
+  dom: {
+    container: document.getElementById("container"),
+    audioButton: document.querySelector(".js-audio-button"),
+  },
 })

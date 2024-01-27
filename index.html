@@ -15,9 +15,23 @@
         width: 100vw;
         height: 100vh;
       }
+
+      .audio-button {
+        position: absolute;
+        color: white;
+        bottom: 10px;
+        left: 10px;
+        z-index: 100;
+        padding: 10px;
+        background: transparent;
+        border: 1px solid white;
+        border-radius: 5px;
+        cursor: pointer;
+      }
     </style>
   </head>
   <body>
+    <button class="audio-button js-audio-button">Play</button>
     <div id="container"></div>
     <script src="js/app.js" type="module"></script>
   </body>
