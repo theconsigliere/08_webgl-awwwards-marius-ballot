@@ -1,4 +1,4 @@
-import { GUI } from "three/examples/jsm/libs/dat.gui.module.js";
+import GUI from "lil-gui"
 
 const _instance = new GUI()
 export default _instance

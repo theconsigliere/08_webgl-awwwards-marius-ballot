@@ -99,6 +99,7 @@ varying vec2 vMatCapUV;
 uniform sampler2D uMatCap;
 uniform float uWaveSize;
 uniform float uWaveBorder;
+uniform float uWaveSpeed;
 uniform vec3 uBorderColour;
 uniform float uTime;
 
@@ -108,7 +109,7 @@ void main() {
     float noise3 = snoise(vec3(vPosition.xz * 5.,uTime * 0.01))*.5;
 
     // LINES WRAPPING AROUND SHADER ANIMATING UP
-    float waves = sin(vPosition.y*5. - uTime*0.1);
+    float waves = sin(vPosition.y*5. - uTime*uWaveSpeed);
 
 
     // MASK THE NOISE TO GET A BORDER

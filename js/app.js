@@ -1,6 +1,7 @@
 import * as THREE from "three"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
-import gui from "lil-gui"
+import MyGUI from "./utils/MyGUI.js"
+import config from "./utils/config.js"
 import gsap from "gsap"
 
 import SpherePillards from "./classes/SpherePillards.js"
@@ -8,12 +9,16 @@ import Floor from "./classes/Floor.js"
 import Spectrum from "./classes/Spectrum.js"
 import SoundReactor from "./classes/SoundReactor.js"
 import ParticleSystem from "./classes/ParticleSystem.js"
+import CameraParallax from "./classes/CameraParallax.js"
+import LoadingController from "./classes/LoadingController.js"
 
 export default class Sketch {
   constructor(options) {
     this.scene = new THREE.Scene()
 
     this.audioButton = options.dom.audioButton
+    this.loadingScreen = options.dom.loadingScreen
+    this.loadingNumberText = options.dom.loadingNumberText
     this.container = options.dom.container
     this.width = this.container.offsetWidth
     this.height = this.container.offsetHeight
@@ -38,17 +43,30 @@ export default class Sketch {
     this.camera.position.set(0, 0, 10)
     // this.camera.lookAt(0, 0, 0)
     this.controls = new OrbitControls(this.camera, this.renderer.domElement)
+
     this.time = 0
 
     this.isPlaying = true
     this.audioIsInit = false
 
+    this.loading()
     this.addObjects()
     this.resize()
     this.render()
     this.setupResize()
     this.addEventListeners()
-    // this.settings();
+    this.settings()
+  }
+
+  loading() {
+    LoadingController.onLoad = () => {
+      this.loadingScreen.classList.add("is-loaded")
+    }
+
+    LoadingController.onProgress = (url, itemsLoaded, itemsTotal) => {
+      const progress = itemsLoaded / itemsTotal
+      this.loadingNumberText.textContent = `${Math.round(progress * 100)}`
+    }
   }
 
   addEventListeners() {
@@ -70,11 +88,48 @@ export default class Sketch {
   }
 
   settings() {
-    this.settings = {
-      progress: 0,
-    }
-    this.gui = new dat.GUI()
-    this.gui.add(this.settings, "progress", 0, 1, 0.01)
+    // set orbit controls
+
+    this.controls.enabled = false
+    this.controls.maxDistance = 40 // stops zooming too far out
+    this.controls.minDistance = 3 // stops zooming too far in
+
+    // stop orbit controls from moving too low (beneath floor)
+    this.controls.minPolarAngle = 0
+    this.controls.maxPolarAngle = Math.PI / 2 + 0.3
+
+    // add fog to scene so we dont see the edges of the floor
+
+    const backgroundColour = new THREE.Color(0x151515)
+    this.scene.background = backgroundColour
+    this.scene.fog = new THREE.Fog(backgroundColour, 15, 30)
+
+    MyGUI.hide()
+
+    if (config.myGui) MyGUI.show()
+
+    const cameraFolder = MyGUI.addFolder("Camera")
+    cameraFolder
+      .add(this.controls, "enabled")
+      .name("Orbit Controls")
+      .onChange(() => {
+        if (this.controls.enabled) CameraParallax.active = false
+      })
+      .listen()
+    cameraFolder
+      .add(CameraParallax, "active")
+      .name("Camera Parallax")
+      .onChange(() => {
+        if (CameraParallax.active) this.controls.enabled = false
+      })
+      .listen()
+
+    cameraFolder
+      .add(CameraParallax.params, "intensity", 0.001, 0.1)
+      .name("Parallax Intensity")
+    cameraFolder
+      .add(CameraParallax.params, "ease", 0.001, 0.1)
+      .name("Parallax Ease")
   }
 
   setupResize() {
@@ -95,6 +150,7 @@ export default class Sketch {
     Floor.init(this.scene)
     Spectrum.init(this.scene)
     ParticleSystem.init(this.scene)
+    CameraParallax.init(this.camera)
   }
 
   stop() {
@@ -115,9 +171,14 @@ export default class Sketch {
     // this.material.uniforms.time.value = this.time
     requestAnimationFrame(this.render.bind(this))
     this.renderer.render(this.scene, this.camera)
+
+    // rotate scene slowly over time
+    this.scene.rotation.y += 0.001
+
     SpherePillards.update(this.time)
     ParticleSystem.update()
     Spectrum.update(this.time)
+    CameraParallax.update()
   }
 }
 
@@ -125,5 +186,7 @@ new Sketch({
   dom: {
     container: document.getElementById("container"),
     audioButton: document.querySelector(".js-audio-button"),
+    loadingScreen: document.querySelector(".js-loading-screen"),
+    loadingNumberText: document.querySelector(".js-loading-text"),
   },
 })

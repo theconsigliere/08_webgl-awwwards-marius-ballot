@@ -1,10 +1,12 @@
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
 import * as THREE from "three"
 
+import LoadingController from "./LoadingController.js"
+
 class Floor {
   constructor(parameters) {
     this.bind
-    this.modelLoader = new GLTFLoader()
+    this.modelLoader = new GLTFLoader(LoadingController)
     // constructor body
   }
 
@@ -19,7 +21,8 @@ class Floor {
         }
       })
 
-      this.floor.translateY(-3)
+      this.floor.translateY(-4)
+      this.floor.scale.multiplyScalar(1.5)
 
       this.scene.add(this.floor)
     })

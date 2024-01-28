@@ -28,9 +28,34 @@
         border-radius: 5px;
         cursor: pointer;
       }
+
+      .loading-screen {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: black;
+        z-index: 1010;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: sans-serif;
+        transition: opacity 0.5s ease;
+      }
+
+      .is-loaded {
+        opacity: 0;
+        pointer-events: none;
+      }
     </style>
   </head>
   <body>
+    <div class="loading-screen js-loading-screen">
+      <h1 style="color: white">
+        Loading <span class="js-loading-text">0</span>%
+      </h1>
+    </div>
     <button class="audio-button js-audio-button">Play</button>
     <div id="container"></div>
     <script src="js/app.js" type="module"></script>

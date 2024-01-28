@@ -1,5 +1,6 @@
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
 import * as THREE from "three"
+import MyGUI from "../utils/MyGUI.js"
 
 import spectrumFragmentShader from "../shaders/spectrumFragment.glsl"
 import spectrumVertexShader from "../shaders/spectrumVertex.glsl"
@@ -27,6 +28,9 @@ class Spectrum {
         uWaveSize: {
           value: 0.6,
         },
+        uWaveSpeed: {
+          value: 0.1,
+        },
         uWaveBorder: {
           value: 0.1,
         },
@@ -36,6 +40,20 @@ class Spectrum {
       },
       transparent: true,
     })
+
+    const shaderFolder = MyGUI.addFolder("Spectrum Shader")
+    shaderFolder
+      .add(this.spectrumShaders.uniforms.uWaveSize, "value", 0, 1)
+      .name("Wave Size")
+    shaderFolder
+      .add(this.spectrumShaders.uniforms.uWaveSpeed, "value", 0, 1)
+      .name("Wave Speed")
+    shaderFolder
+      .add(this.spectrumShaders.uniforms.uWaveBorder, "value", 0, 1)
+      .name("Wave Border")
+    shaderFolder
+      .addColor(this.spectrumShaders.uniforms.uBorderColour, "value")
+      .name("Border Colour")
 
     this.modelLoader.load("../assets/models/spectrum.glb", (glb) => {
       glb.scene.traverse((child) => {

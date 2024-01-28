@@ -1,12 +1,19 @@
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
 import * as THREE from "three"
 import SoundReactor from "./SoundReactor.js"
+import LoadingController from "./LoadingController.js"
+import MyGUI from "../utils/MyGUI.js"
 
 class SpherePillards {
   constructor(parameters) {
-    this.bind
-    this.modelLoader = new GLTFLoader()
+    this.bind()
+    this.modelLoader = new GLTFLoader(LoadingController)
     this.textureLoader = new THREE.TextureLoader()
+    this.params = {
+      waveSpeed: 1,
+      subDiv: 3,
+      pillardsSize: 0.2,
+    }
     // constructor body
   }
 
@@ -44,13 +51,41 @@ class SpherePillards {
       })
       this.computePositions()
     })
+
+    const sphereFolder = MyGUI.addFolder("Sphere Pillards")
+    sphereFolder.add(this.params, "waveSpeed", 0.01, 5).name("Wave Speed")
+    sphereFolder
+      .add(this.params, "pillardsSize", 0.01, 0.8)
+      .name("Pillards Size")
+      .onChange(() => {
+        this.computePositions()
+      })
+    sphereFolder
+      .add(this.params, "subDiv", 1, 5)
+      .step(1)
+      .name("Sphere Subdivisions")
+      .onChange(() => {
+        this.computePositions()
+      })
   }
 
   computePositions() {
-    const sphereGeometry = new THREE.IcosahedronGeometry(2, 3)
+    // if sphere already exists, remove it (used for GUI)
+    let ico
+
+    this.scene.traverse((child) => {
+      if (child.name === "Sphere") ico = child
+    })
+
+    if (ico) this.scene.remove(ico)
+
+    const sphereGeometry = new THREE.IcosahedronGeometry(2, this.params.subDiv)
     const sphereMaterial = this.greyMatCap
     const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial)
+    sphere.name = "Sphere"
     this.scene.add(sphere)
+
+    this.pillards.clear()
 
     let vertexArray = []
 
@@ -98,7 +133,7 @@ class SpherePillards {
         )
 
         const clone = this.pillard.clone()
-        clone.scale.multiplyScalar(0.2)
+        clone.scale.multiplyScalar(this.params.pillardsSize)
         const positionVector = new THREE.Vector3(
           vertexArray[i].x,
           vertexArray[i].y,
@@ -133,13 +168,21 @@ class SpherePillards {
       let i = 0
       while (i < this.pillards.children.length) {
         this.pillards.children[i].children[0].position.y =
-          (Math.sin(time * 10 + this.pillards.children[i].position.x) + 1) * 1.2
+          (Math.sin(
+            time * (5 * this.params.waveSpeed) +
+              this.pillards.children[i].position.x
+          ) +
+            1) *
+          1.2
         i++
       }
     }
   }
 
-  bind() {}
+  bind() {
+    this.computePositionsEvent = this.computePositions.bind(this)
+    this.init = this.init.bind(this)
+  }
   // methods
 }
 const _instance = new SpherePillards()
